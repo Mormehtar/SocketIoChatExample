@@ -1,0 +1,30 @@
+{
+  "name": "SocketIoChatExample",
+  "version": "1.0.0",
+  "description": "Socket.io simple chat example",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Mormehtar/SocketIoChatExample.git"
+  },
+  "keywords": [
+    "socket.io",
+    "chat"
+  ],
+  "author": "Dark Rider <mormehtar@gmail.com>",
+  "license": "GNU",
+  "bugs": {
+    "url": "https://github.com/Mormehtar/SocketIoChatExample/issues"
+  },
+  "homepage": "https://github.com/Mormehtar/SocketIoChatExample",
+  "dependencies": {
+    "socket.io": "^1.3.7"
+  },
+  "devDependencies": {
+    "mocha": "^2.3.4",
+    "sinon": "^1.17.2"
+  }
+}
