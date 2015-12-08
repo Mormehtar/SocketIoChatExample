@@ -1,17 +1,19 @@
 var util = require("util");
+var Users = require("./users");
+var History = require("./history");
+
+var MAIN_ROOM = "loggedIn";
 
 function Chat (io) {
     this.io = io;
-    this.messages = [];
-    this.users = {};
+    this.users = new Users();
+    this.history = new History(io.to(MAIN_ROOM));
+
+    this.io.on("connect", this.askLogin.bind(this));
+    this.io.on("disconnect", this.logOut.bind(this));
 }
 
 module.exports = Chat;
-
-Chat.prototype.init = function() {
-    this.io.on("connect", this.askLogin.bind(this));
-    this.io.on("disconnect", this.logOut.bind(this));
-};
 
 Chat.prototype.askLogin = function (socket) {
     socket.on("login", this.logIn.bind(this, socket));
@@ -19,35 +21,35 @@ Chat.prototype.askLogin = function (socket) {
 };
 
 Chat.prototype.logIn = function (socket, username) {
-    if (this.users[username]) {
+    if (this.users.login(username)) {
         socket.emit("login", {text: util.format("Имя %s занято. Введите другое предпочитаемое имя пользователя.", username)});
         return;
     }
-    this.users[username] = socket;
     socket.username = username;
-    var loginObject = {username: username, date: new Date()};
-    socket.broadcast.emit("loggedIn", loginObject);
-    this.history.push({type: "loggedIn", data: loginObject});
+    this.history.addEvent("loggedIn", {username: username, date: new Date()});
     socket.emit("loadHistory", this.history);
     socket.on("message", this.sendMessage.bind(this, socket));
+    socket.join(MAIN_ROOM);
 };
 
 Chat.prototype.sendMessage = function (socket, message) {
-    var messageObject = {
-        date: new Date(),
-        username: socket.username,
-        message: message
-    };
-    this.history.push({type: "message", data: messageObject});
-    socket.broadcast.emit("message", messageObject);
+    this.history.addEvent(
+        "message",
+        {
+            date: new Date(),
+            username: socket.username,
+            message: message
+        }
+    );
 };
 
 Chat.prototype.logOut = function (socket) {
-    var logOutObject = {
-        date: new Date(),
-        username: socket.username
-    };
-    this.history.push({type:"loggedOut", data: logOutObject});
-    delete this.users[socket.username];
-    socket.broadcast.emit("loggedOut", logOutObject);
+    this.history.addEvent(
+        "loggedOut",
+        {
+            date: new Date(),
+            username: socket.username
+        }
+    );
+    this.users.logOut(socket.username);
 };
