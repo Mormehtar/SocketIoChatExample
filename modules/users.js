@@ -4,7 +4,7 @@ function Users () {
 
 module.exports = Users;
 
-Users.prototype.login = function (username) {
+Users.prototype.logIn = function (username) {
     if (this.users[username]) {
         return false;
     }

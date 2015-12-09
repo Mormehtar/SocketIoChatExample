@@ -16,18 +16,18 @@ function Chat (io) {
 module.exports = Chat;
 
 Chat.prototype.askLogin = function (socket) {
-    socket.on("login", this.logIn.bind(this, socket));
-    socket.emit("login", {text: "Введите предпочитаемое имя пользователя."});
+    socket.on("logIn", this.logIn.bind(this, socket));
+    socket.emit("logIn", {text: "Введите предпочитаемое имя пользователя."});
 };
 
 Chat.prototype.logIn = function (socket, username) {
-    if (this.users.login(username)) {
-        socket.emit("login", {text: util.format("Имя %s занято. Введите другое предпочитаемое имя пользователя.", username)});
+    if (this.users.logIn(username)) {
+        socket.emit("logIn", {text: util.format("Имя %s занято. Введите другое предпочитаемое имя пользователя.", username)});
         return;
     }
     socket.username = username;
     this.history.addEvent("loggedIn", {username: username, date: new Date()});
-    socket.emit("loadHistory", this.history);
+    socket.emit("loadHistory", this.history.getEvents());
     socket.on("message", this.sendMessage.bind(this, socket));
     socket.join(MAIN_ROOM);
 };
