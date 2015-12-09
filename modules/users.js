@@ -14,3 +14,7 @@ Users.prototype.logIn = function (username) {
 Users.prototype.logOut = function (username) {
     delete this.users[username];
 };
+
+Users.prototype.getUserList = function () {
+    return Object.keys(this.users).sort();
+};
