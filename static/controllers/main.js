@@ -10,6 +10,12 @@ function logInButtonHandler () {
 var messagesContainer = document.getElementById("messages_container");
 var usernamesContainer = document.getElementById("user_list");
 
+function cleanupNode (node) {
+    while (node.lastChild) {
+        node.removeChild(node.lastChild);
+    }
+}
+
 function createUserNameElement (username) {
     var span = document.createElement("span");
     span.className = "username";
@@ -18,17 +24,21 @@ function createUserNameElement (username) {
     return span;
 }
 
-function userMove(dataObject, actionText) {
+function userDescribe(dataObject, actionText) {
     var time = document.createElement("span");
     time.className = "message_time";
     time.appendChild(document.createTextNode(new Date(dataObject.date).toLocaleString()));
     var username = createUserNameElement(dataObject.username);
-    var text = document.createElement("span");
-    text.appendChild(document.createTextNode(": " + actionText + " "));
     var container = document.createElement("div");
     container.className = "message_container";
     container.appendChild(time);
-    container.appendChild(text);
+
+    if (actionText) {
+        var text = document.createElement("span");
+        text.appendChild(document.createTextNode(": " + actionText + " "));
+        container.appendChild(text);
+    }
+
     container.appendChild(username);
     return container;
 }
@@ -62,10 +72,13 @@ var actions = {
         mainContainer.appendChild(background);
         mainContainer.appendChild(dialogContainer);
 
+        cleanupNode(messagesContainer);
+        cleanupNode(usernamesContainer);
+
         document.body.appendChild(mainContainer);
     },
     loggedIn: function (dataObject, history) {
-        var container = userMove(dataObject, "в комнату вошёл");
+        var container = userDescribe(dataObject, "в комнату вошёл");
         if (history) {
             return container;
         }
@@ -87,7 +100,7 @@ var actions = {
         }
     },
     loggedOut: function (dataObject, history) {
-        var container = userMove(dataObject, "из комнаты вышел");
+        var container = userDescribe(dataObject, "из комнаты вышел");
         if (history) {
             return container;
         }
@@ -95,9 +108,33 @@ var actions = {
         var usernameContainer = usernamesContainer.getElementsByName(dataObject.username)[0];
         if (usernameContainer) {usernamesContainer.removeChild(usernameContainer);}
     },
-    message: function (dataObject) {},
-    loadHistory: function (dataObject) {},
-    userList: function (dataObject) {}
+    message: function (dataObject, history) {
+        var container = userDescribe(dataObject);
+        var text = document.createElement("span");
+        text.appendChild(document.createTextNode(": " + dataObject.message));
+        container.appendChild(text);
+        if (history) {
+            return container;
+        }
+        messagesContainer.appendChild(container);
+    },
+    loadHistory: function (dataObject) {
+        var container = document.createDocumentFragment();
+        dataObject.forEach(function (historyItem) {
+            container.appendChild(actions[historyItem.type](historyItem.data, true));
+        });
+        messagesContainer.appendChild(container);
+    },
+    userList: function (dataObject) {
+        var container = document.createDocumentFragment();
+        dataObject.forEach(function (username) {
+            var usernameContainer = document.createElement("div");
+            usernameContainer.className = "username_list";
+            usernameContainer.appendChild(createUserNameElement(username));
+            container.appendChild(usernameContainer);
+        });
+        usernamesContainer.appendChild(container);
+    }
 };
 
 Object.keys(actions).forEach(function (action) {

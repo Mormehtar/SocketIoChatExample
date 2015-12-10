@@ -21,6 +21,7 @@ Chat.prototype.askLogin = function (socket) {
 };
 
 Chat.prototype.logIn = function (socket, username) {
+    if (!username || socket.username) { return; }
     if (!this.users.logIn(username)) {
         socket.emit("logIn", {text: util.format("Имя %s занято. Введите другое предпочитаемое имя пользователя.", username)});
         return;
