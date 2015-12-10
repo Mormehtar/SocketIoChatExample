@@ -1,4 +1,5 @@
 var util = require("util");
+
 var Users = require("./users");
 var History = require("./history");
 
@@ -26,8 +27,8 @@ Chat.prototype.logIn = function (socket, username) {
         socket.emit("logIn", {text: util.format("Имя %s занято. Введите другое предпочитаемое имя пользователя.", username)});
         return;
     }
-    socket.username = username;
     this.history.addEvent("loggedIn", {username: username, date: new Date()});
+    socket.username = username;
     socket.emit("loadHistory", this.history.getEvents());
     socket.emit("userList", this.users.getUserList());
     socket.on("message", this.sendMessage.bind(this, socket));
@@ -46,6 +47,7 @@ Chat.prototype.sendMessage = function (socket, message) {
 };
 
 Chat.prototype.logOut = function (socket) {
+    if (!socket.username) { return; }
     this.history.addEvent(
         "loggedOut",
         {

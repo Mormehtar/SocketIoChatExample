@@ -19,7 +19,7 @@ function cleanupNode (node) {
 function createUserNameElement (username) {
     var span = document.createElement("span");
     span.className = "username";
-    span.name = username;
+    span.setAttribute("name", username);
     span.appendChild(document.createTextNode(username));
     return span;
 }
@@ -105,7 +105,7 @@ var actions = {
             return container;
         }
         messagesContainer.appendChild(container);
-        var usernameContainer = usernamesContainer.getElementsByName(dataObject.username)[0];
+        var usernameContainer = usernamesContainer.querySelector("[name=" + dataObject.username + "]").parentNode;
         if (usernameContainer) {usernamesContainer.removeChild(usernameContainer);}
     },
     message: function (dataObject, history) {
@@ -113,9 +113,7 @@ var actions = {
         var text = document.createElement("span");
         text.appendChild(document.createTextNode(": " + dataObject.message));
         container.appendChild(text);
-        if (history) {
-            return container;
-        }
+        if (history) { return container; }
         messagesContainer.appendChild(container);
     },
     loadHistory: function (dataObject) {
@@ -138,6 +136,6 @@ var actions = {
 };
 
 Object.keys(actions).forEach(function (action) {
-    socket.on(action, actions[action]);
+    socket.on(action, function (dataObject) {console.log(action, dataObject); actions[action](dataObject)});
 });
 
