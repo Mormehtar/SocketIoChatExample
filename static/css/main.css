@@ -73,3 +73,17 @@
     left: 50%;
     transform: translate(-50%, 0);
 }
+
+.system_message {
+    font-style: italic;
+}
+
+.username, .message_time {
+    font-weight: bold;
+}
+
+.message_box {
+    display: block;
+    width: 100%;
+    height: auto;
+}
