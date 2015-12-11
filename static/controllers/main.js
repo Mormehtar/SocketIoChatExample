@@ -27,7 +27,7 @@ function cleanupNode (node) {
 function createUserNameElement (username) {
     var span = document.createElement("span");
     span.className = "username";
-    span.setAttribute("name", username);
+    span.setAttribute("data-username", username);
     span.appendChild(document.createTextNode(username));
     return span;
 }
@@ -113,7 +113,7 @@ var actions = {
             return container;
         }
         messagesContainer.appendChild(container);
-        var usernameContainer = usernamesContainer.querySelector("[name=" + dataObject.username + "]").parentNode;
+        var usernameContainer = usernamesContainer.querySelector("[data-username=\"" + dataObject.username + "\"]").parentNode;
         if (usernameContainer) {usernamesContainer.removeChild(usernameContainer);}
     },
     message: function (dataObject, history) {
