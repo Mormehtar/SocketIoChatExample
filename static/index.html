@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="css/main.css"></link>
+    <title>Чат</title>
+</head>
+<body class="main">
+
+    <div class="content">
+        <div class="messages" id="messages_container">
+        </div>
+        <div class="input">
+            <textarea class="message_box" id="message_box"></textarea>
+            <button onclick="sendMessage()">Отправить</button>
+        </div>
+    </div>
+    <div class="users" id="user_list">
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="controllers/main.js"></script>
+
+</body>
+</html>
