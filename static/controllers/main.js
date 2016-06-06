@@ -1,5 +1,9 @@
 var socket = io();
 
+var messageBox = document.getElementById("message_box");
+var messagesContainer = document.getElementById("messages_container");
+var usernamesContainer = document.getElementById("user_list");
+
 function logInButtonHandler () {
     var dialogContainer = document.getElementsByClassName("main_dialog_container")[0];
     var text = dialogContainer.getElementsByClassName("log_in_input")[0].value;
@@ -7,8 +11,12 @@ function logInButtonHandler () {
     socket.emit("logIn", text);
 }
 
-var messagesContainer = document.getElementById("messages_container");
-var usernamesContainer = document.getElementById("user_list");
+function sendMessage () {
+    var text = messageBox.value;
+    messageBox.value = "";
+    socket.emit("message", text);
+}
+
 
 function cleanupNode (node) {
     while (node.lastChild) {
@@ -19,7 +27,7 @@ function cleanupNode (node) {
 function createUserNameElement (username) {
     var span = document.createElement("span");
     span.className = "username";
-    span.setAttribute("name", username);
+    span.setAttribute("data-username", username);
     span.appendChild(document.createTextNode(username));
     return span;
 }
@@ -29,16 +37,14 @@ function userDescribe(dataObject, actionText) {
     time.className = "message_time";
     time.appendChild(document.createTextNode(new Date(dataObject.date).toLocaleString()));
     var username = createUserNameElement(dataObject.username);
+
+    var text = document.createElement("span");
+    text.appendChild(document.createTextNode(actionText ? ": " + actionText + " " : " "));
+
     var container = document.createElement("div");
     container.className = "message_container";
     container.appendChild(time);
-
-    if (actionText) {
-        var text = document.createElement("span");
-        text.appendChild(document.createTextNode(": " + actionText + " "));
-        container.appendChild(text);
-    }
-
+    container.appendChild(text);
     container.appendChild(username);
     return container;
 }
@@ -79,6 +85,7 @@ var actions = {
     },
     loggedIn: function (dataObject, history) {
         var container = userDescribe(dataObject, "в комнату вошёл");
+        container.className += " system_message";
         if (history) {
             return container;
         }
@@ -101,11 +108,12 @@ var actions = {
     },
     loggedOut: function (dataObject, history) {
         var container = userDescribe(dataObject, "из комнаты вышел");
+        container.className += " system_message";
         if (history) {
             return container;
         }
         messagesContainer.appendChild(container);
-        var usernameContainer = usernamesContainer.querySelector("[name=" + dataObject.username + "]").parentNode;
+        var usernameContainer = usernamesContainer.querySelector("[data-username=\"" + dataObject.username + "\"]").parentNode;
         if (usernameContainer) {usernamesContainer.removeChild(usernameContainer);}
     },
     message: function (dataObject, history) {
@@ -121,6 +129,7 @@ var actions = {
         dataObject.forEach(function (historyItem) {
             container.appendChild(actions[historyItem.type](historyItem.data, true));
         });
+        cleanupNode(messagesContainer);
         messagesContainer.appendChild(container);
     },
     userList: function (dataObject) {
@@ -131,6 +140,7 @@ var actions = {
             usernameContainer.appendChild(createUserNameElement(username));
             container.appendChild(usernameContainer);
         });
+        cleanupNode(usernamesContainer);
         usernamesContainer.appendChild(container);
     }
 };
