@@ -1,8 +1,11 @@
 {
   "name": "SocketIoChatExample",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Socket.io simple chat example",
   "main": "index.js",
+  "engine": {
+    "node": "0.10.37"
+  },
   "scripts": {
     "test": "node node_modules/.bin/mocha --recursive --ui bdd tests",
     "start": "node index"
