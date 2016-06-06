@@ -9,6 +9,6 @@ app.use(express.static('static'));
 
 app.set("chat", new Chat(io));
 
-http.listen(process.env.port || 80, function(){
-    console.log('listening on *:' + (process.env.port || 80));
+http.listen(process.env.PORT || 5000, function(){
+    console.log('listening on *:' + (process.env.PORT || 5000));
 });
