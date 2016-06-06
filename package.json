@@ -1,6 +1,6 @@
 {
   "name": "SocketIoChatExample",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Socket.io simple chat example",
   "main": "index.js",
   "engine": {
